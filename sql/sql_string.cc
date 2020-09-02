@@ -120,7 +120,11 @@ bool Binary_string::realloc_raw(size_t alloc_length)
 
 bool String::set_int(longlong num, bool unsigned_flag, CHARSET_INFO *cs)
 {
-  uint l=20*cs->mbmaxlen+1;
+  /*
+    This allocates a few bytes extra in the unlikely case that cs->mb_maxlen
+    > 1, but we can live with that
+  */
+  uint l= LONGLONG_BUFFER_SIZE * cs->mbmaxlen;
   int base= unsigned_flag ? 10 : -10;
 
   if (alloc(l))
