@@ -3613,7 +3613,7 @@ String *Item_int::val_str(String *str)
 
 void Item_int::print(String *str, enum_query_type query_type)
 {
-  StringBuffer<LONGLONG_BUFFER_SIZE+1> buf;
+  StringBuffer<LONGLONG_BUFFER_SIZE> buf;
   // my_charset_bin is good enough for numbers
   buf.set_int(value, unsigned_flag, &my_charset_bin);
   str->append(buf);
@@ -4575,7 +4575,7 @@ const String *Item_param::value_query_val_str(THD *thd, String *str) const
         break;
       }
       DBUG_ASSERT(str->length() <= typelen);
-      buf= str->c_ptr_quick();
+      buf= (char*) str->ptr();
       ptr= buf + str->length();
       *ptr++= '\'';
       ptr+= (uint) my_TIME_to_str(&value.time, ptr, decimals);
@@ -4681,7 +4681,7 @@ Item *Item_param::value_clone_item(THD *thd)
     return 0; // Should create Item_decimal. See MDEV-11361.
   case STRING_RESULT:
     return new (mem_root) Item_string(thd, name,
-                                      Lex_cstring(value.m_string.c_ptr_quick(),
+                                      Lex_cstring(value.m_string.ptr(),
                                                   value.m_string.length()),
                                       value.m_string.charset(),
                                       collation.derivation,
